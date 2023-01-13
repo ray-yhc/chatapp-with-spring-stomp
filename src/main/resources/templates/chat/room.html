@@ -67,26 +67,10 @@
     var messages = [];
     var messageHtml = '';
 
+    // 홈페이지 로딩 후 실행
     connect();
     sender = localStorage.getItem('wschat.sender');
     findRoom();
-
-    // eventListener 생성 -> 메시지 전송
-    let sendInput = document.querySelector('input.send');
-    let sendButton = document.querySelector('button.send');
-    sendInput.addEventListener('keyup', function (e) {
-        if (e.keyCode === 13) {
-            var message = e.target.value;
-            sendMessage(message);
-            e.target.value = "Send message...";
-        }
-    });
-    sendButton.addEventListener('click', function () {
-        var message = sendInput.value;
-        sendMessage(message);
-        sendInput.value = "Send message...";
-    });
-
 
     // roomId로 채팅방 정보 조회
     function findRoom() {
@@ -96,15 +80,7 @@
         });
     }
 
-    function sendMessage(message) {
-        ws.send("/app/chat/message", {}, JSON.stringify({
-            type: 'TALK',
-            roomId: roomId,
-            sender: sender,
-            message: message
-        }));
-    }
-
+    // 받은 메시지 처리
     function recvMessage(recv) {
         // 배열의 맨 앞에 요소 추가
         messages.unshift({
@@ -115,16 +91,28 @@
         refresh();
     }
 
+    // 메시지 전송
+    function sendMessage(message) {
+        // 보낼 때는 controller로 전송
+        ws.send("/pub/message", {}, JSON.stringify({
+            type: 'TALK',
+            roomId: roomId,
+            sender: sender,
+            message: message
+        }));
+    }
 
     function connect() {
         // pub/sub event
         ws.connect({}, function (frame) {
-            ws.subscribe("/topic/chat/room/" + roomId, function (message) {
+            // 받을 때는 구독한 토픽으로부터 읽어온다.
+            ws.subscribe("/topic/room/" + roomId, function (message) {
                 var recv = JSON.parse(message.body);
-                console.log('hello');
                 recvMessage(recv);
             });
-            ws.send("/chat/message", {}, JSON.stringify({
+
+            // enter 메시지 전송 / 보낼 때는 controller로 전송
+            ws.send("/pub/message", {}, JSON.stringify({
                 type: 'ENTER',
                 roomId: roomId,
                 sender: sender
@@ -150,7 +138,7 @@
         // messages
         if (messages && messages.length !== 0) {
             var msg = messages[0];
-            if (false) {
+            if (msg.type == 'ENTER' || msg.type == 'ALERT') {
                 messageHtml += `<label>${msg.message}</label>`;
             } else if (msg.sender == sender) {
                 messageHtml += `<div class="message right"> \
@@ -176,6 +164,22 @@
             document.querySelector('#chat-messages').innerHTML = messageHtml;
         }
     }
+
+    // eventListener 생성 -> 메시지 전송
+    let sendInput = document.querySelector('input.send');
+    let sendButton = document.querySelector('button.send');
+    sendInput.addEventListener('keyup', function (e) {
+        if (e.keyCode === 13) {
+            var message = e.target.value;
+            sendMessage(message);
+            e.target.value = "Send message...";
+        }
+    });
+    sendButton.addEventListener('click', function () {
+        var message = sendInput.value;
+        sendMessage(message);
+        sendInput.value = "Send message...";
+    });
 
     // sendmessage 커서 입력시 동작
     $("#sendmessage input").focus(function(){

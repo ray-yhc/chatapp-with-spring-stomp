@@ -11,15 +11,18 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
-    @MessageMapping("/hello")
-    public void message(Message message) {
-        simpMessageSendingOperations
+//    @MessageMapping("/hello")
+//    public void message(Message message) {
+//        simpMessageSendingOperations
+//                .convertAndSend("/sub/channel/" + message.getRoomId(), message);
+//    }
 
-                .convertAndSend("/sub/channel/" + message.getRoomId(), message);
-    }
 
-
-    @MessageMapping("/chat/message")
+    /**
+     * /pub/message <br>
+     * 메시지 전송시에는 controller에서 처리
+     */
+    @MessageMapping("/message")
     public void enter(Message message) {
 
         System.out.println((message.getMessage() != null ? message.getMessage() : "null") );
@@ -29,6 +32,6 @@ public class ChatController {
         }
 
         simpMessageSendingOperations
-                .convertAndSend("/topic/chat/room/"+message.getRoomId(),message);
+                .convertAndSend("/topic/room/"+message.getRoomId(),message);
     }
 }

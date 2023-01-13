@@ -7,8 +7,10 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
-@EnableWebSocketMessageBroker
+@EnableWebSocketMessageBroker // stomp에서 사용하는 annotaion
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
+
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
@@ -17,9 +19,16 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 .withSockJS();
     }
 
+
+    /**
+     * /topic : 1명 msg 발행 - n명 구독 <br>
+     * /queue : 발행한 1명에게 다시 정보를 전송 <br>
+     * /put : 발행 시의 uri prefix
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
+        // topic 방식과 queue 방식이 있다.
         registry.enableSimpleBroker("/queue", "/topic");
-        registry.setApplicationDestinationPrefixes("/app");
+        registry.setApplicationDestinationPrefixes("/pub");
     }
 }
