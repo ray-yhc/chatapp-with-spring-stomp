@@ -1,21 +1,21 @@
 package com.example.chatapp.src.chat;
 
-import com.example.chatapp.src.chat.model.Message;
+import com.example.chatapp.src.chat.model.MessageModel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
 @Controller
-@RequiredArgsConstructor
 public class ChatController {
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
-//    @MessageMapping("/hello")
-//    public void message(Message message) {
-//        simpMessageSendingOperations
-//                .convertAndSend("/sub/channel/" + message.getRoomId(), message);
-//    }
+    @Autowired
+    public ChatController(SimpMessageSendingOperations simpMessageSendingOperations) {
+        this.simpMessageSendingOperations = simpMessageSendingOperations;
+    }
+
 
 
     /**
@@ -23,15 +23,12 @@ public class ChatController {
      * 메시지 전송시에는 controller에서 처리
      */
     @MessageMapping("/message")
-    public void enter(Message message) {
-
-        System.out.println((message.getMessage() != null ? message.getMessage() : "null") );
-
-        if (message.getType().equals("ENTER")) {
-            message.setMessage(message.getSender()+"님이 입장하였습니다.");
+    public void enter(MessageModel messageModel) {
+        if (messageModel.getType().equals("ENTER")) {
+            messageModel.setMessage(messageModel.getSender()+"님이 입장하였습니다.");
         }
 
         simpMessageSendingOperations
-                .convertAndSend("/topic/room/"+message.getRoomId(),message);
+                .convertAndSend("/topic/room/"+ messageModel.getRoomCode(), messageModel);
     }
 }

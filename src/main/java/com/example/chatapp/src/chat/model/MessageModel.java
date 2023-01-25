@@ -4,10 +4,10 @@ import lombok.*;
 
 @Getter @Builder @Setter
 @AllArgsConstructor @NoArgsConstructor
-public class Message {
+public class MessageModel {
     private String type;
     private String sender;
-    private String roomId;
+    private String roomCode;
     private String message;
 
 

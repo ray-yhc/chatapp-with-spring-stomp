@@ -1,8 +1,8 @@
 package com.example.chatapp.src.chat.Repository;
 
-import com.example.chatapp.src.chat.model.Chat;
-import com.example.chatapp.src.chat.model.ChatRoom;
-import com.example.chatapp.src.chat.model.Room;
+import com.example.chatapp.src.chat.model.ChatModel;
+import com.example.chatapp.src.chat.model.RoomModel;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -11,10 +11,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+@Repository @Deprecated
 public class MemoryChatRepository implements ChatRepository{
 
-    private Map<String, Room> chatRoomsMemory;
+    private Map<String, RoomModel> chatRoomsMemory;
     @PostConstruct
     //의존관게 주입완료되면 실행되는 코드
     private void init() {
@@ -25,26 +25,31 @@ public class MemoryChatRepository implements ChatRepository{
     }
 
     @Override
-    public Room createRoom(String name) {
-        Room room = Room.create(name);
-        chatRoomsMemory.put(room.getRoomId(), room);
-        return room;
+    public RoomModel createRoom(String name) {
+        RoomModel roomModel = RoomModel.create(name);
+        chatRoomsMemory.put(roomModel.getRoomCode(), roomModel);
+        return roomModel;
     }
 
     @Override
-    public List<Room> findAllRooms() {
-        List<Room> list = new ArrayList<>(chatRoomsMemory.values());
+    public List<RoomModel> findAllRooms() {
+        List<RoomModel> list = new ArrayList<>(chatRoomsMemory.values());
         // todo : 시간순 정렬 필요 !
         return list;
     }
 
     @Override
-    public Room findRoomById(String roomId ) {
-        return chatRoomsMemory.get(roomId);
+    public RoomModel findRoomByRoomCode(String roomCode ) {
+        return chatRoomsMemory.get(roomCode);
     }
 
     @Override
-    public Chat addChat(Chat chat) {
+    public RoomModel findRoomById(Long roomId) {
+        return null;
+    }
+
+    @Override
+    public ChatModel addChat(ChatModel chatModel) {
         return null;
     }
 }

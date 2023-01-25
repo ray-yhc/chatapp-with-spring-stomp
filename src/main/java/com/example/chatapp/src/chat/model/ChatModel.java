@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Chat {
+public class ChatModel {
     private long id;
     private String type;
     private String sender;

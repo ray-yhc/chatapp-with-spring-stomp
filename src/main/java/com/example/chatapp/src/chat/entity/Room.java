@@ -1,5 +1,6 @@
 package com.example.chatapp.src.chat.entity;
 
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.*;
 
@@ -8,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
-
 
 @Entity
 @Data
@@ -21,6 +21,8 @@ public class Room {
 
     @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
+    private String roomCode;
     @ColumnDefault("''")
     private String profileImgUrl;
 

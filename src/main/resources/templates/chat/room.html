@@ -43,6 +43,8 @@
     </div>
 </div>
 
+<!-- 템플릿 출처 : https://codepen.io/virgilpana/pen/ZYZXgP -->
+
 <!-- JavaScript -->
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"
@@ -54,7 +56,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const roomId = /*[[${roomId}]]*/;
+    const roomCode = /*[[${roomCode}]]*/;
     /*]]>*/
 
     // websocket & stomp initialize
@@ -72,9 +74,9 @@
     sender = localStorage.getItem('wschat.sender');
     findRoom();
 
-    // roomId로 채팅방 정보 조회
+    // roomCode로 채팅방 정보 조회
     function findRoom() {
-        axios.get('/app/chat/room/' + roomId).then(response => {
+        axios.get('/app/chat/room/' + roomCode).then(response => {
             room = response.data;
             refresh();
         });
@@ -96,7 +98,7 @@
         // 보낼 때는 controller로 전송
         ws.send("/pub/message", {}, JSON.stringify({
             type: 'TALK',
-            roomId: roomId,
+            roomCode: roomCode,
             sender: sender,
             message: message
         }));
@@ -106,7 +108,7 @@
         // pub/sub event
         ws.connect({}, function (frame) {
             // 받을 때는 구독한 토픽으로부터 읽어온다.
-            ws.subscribe("/topic/room/" + roomId, function (message) {
+            ws.subscribe("/topic/room/" + roomCode, function (message) {
                 var recv = JSON.parse(message.body);
                 recvMessage(recv);
             });
@@ -114,7 +116,7 @@
             // enter 메시지 전송 / 보낼 때는 controller로 전송
             ws.send("/pub/message", {}, JSON.stringify({
                 type: 'ENTER',
-                roomId: roomId,
+                roomCode: roomCode,
                 sender: sender
             }));
         }, function (error) {
