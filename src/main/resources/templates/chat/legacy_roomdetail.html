@@ -17,18 +17,18 @@
 <body>
 
 <div>
-    <button onclick="location.href=`/chat/room`">돌아가기</button>
+    <button onclick="location.href=`/chatModel/roomModel`">돌아가기</button>
 </div>
 
 <div class="container" id="app">
     <div>
-        <h2 id="room-name"></h2>
+        <h2 id="roomModel-name"></h2>
     </div>
     <div class="input-group">
         <div class="input-group-prepend">
             <label class="input-group-text">내용</label>
         </div>
-        <input type="text" class="form-control send" v-model="message">
+        <input type="text" class="form-control send" v-model="messageModel">
         <div class="input-group-append">
             <button class="btn btn-primary send" type="button">보내기</button>
         </div>
@@ -41,24 +41,24 @@
 
 
 <div>
-    <button onclick="location.href=`/chat/room`">돌아가기</button>
+    <button onclick="location.href=`/chatModel/roomModel`">돌아가기</button>
 </div>
 <div class="container" id="app" v-cloak>
     <div>
-        <h2>{{room.name}}</h2>
+        <h2>{{roomModel.name}}</h2>
     </div>
     <div class="input-group">
         <div class="input-group-prepend">
             <label class="input-group-text">내용</label>
         </div>
-        <input type="text" class="form-control" v-model="message" v-on:keypress.enter="sendMessage">
+        <input type="text" class="form-control" v-model="messageModel" v-on:keypress.enter="sendMessage">
         <div class="input-group-append">
             <button class="btn btn-primary" type="button" @click="sendMessage">보내기</button>
         </div>
     </div>
     <ul class="list-group">
-        <li class="list-group-item" v-for="message in messages">
-            {{message.sender}} - {{message.message}}
+        <li class="list-group-item" v-for="messageModel in messages">
+            {{messageModel.sender}} - {{messageModel.messageModel}}
         </li>
     </ul>
     <div></div>
@@ -76,7 +76,7 @@
 <script>
     //alert(document.title);
     // websocket & stomp initialize
-    var sock = new SockJS("/ws/chat");
+    var sock = new SockJS("/ws/chatModel");
     var ws = Stomp.over(sock);
     var reconnect = 0;
     // vue.js
@@ -84,9 +84,9 @@
         el: '#app',
         data: {
             roomId: '',
-            room: {},
+            roomModel: {},
             sender: '',
-            message: '',
+            messageModel: '',
             messages: []
         },
         created() {
@@ -96,14 +96,14 @@
         },
         methods: {
             findRoom: function() {
-                axios.get('/chat/room/'+this.roomId).then(response => { this.room = response.data; });
+                axios.get('/chatModel/roomModel/'+this.roomId).then(response => { this.roomModel = response.data; });
             },
             sendMessage: function() {
-                ws.send("/app/chat/message", {}, JSON.stringify({type:'TALK', roomId:this.roomId, sender:this.sender, message:this.message}));
-                this.message = '';
+                ws.send("/app/chatModel/messageModel", {}, JSON.stringify({type:'TALK', roomId:this.roomId, sender:this.sender, messageModel:this.messageModel}));
+                this.messageModel = '';
             },
             recvMessage: function(recv) {
-                this.messages.unshift({"type":recv.type,"sender":recv.type=='ENTER'?'[알림]':recv.sender,"message":recv.message})
+                this.messages.unshift({"type":recv.type,"sender":recv.type=='ENTER'?'[알림]':recv.sender,"messageModel":recv.messageModel})
             }
         }
     });
@@ -111,17 +111,17 @@
     function connect() {
         // pub/sub event
         ws.connect({}, function(frame) {
-            ws.subscribe("/topic/chat/room/"+vm.$data.roomId, function(message) {
-                var recv = JSON.parse(message.body);
+            ws.subscribe("/topic/chatModel/roomModel/"+vm.$data.roomId, function(messageModel) {
+                var recv = JSON.parse(messageModel.body);
                 console.log('hello');
                 vm.recvMessage(recv);
             });
-            ws.send("/app/chat/message", {}, JSON.stringify({type:'ENTER', roomId:vm.$data.roomId, sender:vm.$data.sender}));
+            ws.send("/app/chatModel/messageModel", {}, JSON.stringify({type:'ENTER', roomId:vm.$data.roomId, sender:vm.$data.sender}));
         }, function(error) {
             if(reconnect++ <= 5) {
                 setTimeout(function() {
                     console.log("connection reconnect");
-                    sock = new SockJS("/ws/chat");
+                    sock = new SockJS("/ws/chatModel");
                     ws = Stomp.over(sock);
                     connect();
                 },10*1000);
