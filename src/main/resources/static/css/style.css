@@ -328,6 +328,8 @@ div.message.right .corner {
 }
 
 .bubble span {
+    text-align: right;
+    width: 60px;
     color: #aab8c2;
     font-size: 11px;
     position: absolute;
