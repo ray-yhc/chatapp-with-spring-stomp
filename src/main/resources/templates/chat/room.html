@@ -78,18 +78,13 @@
     function findRoom() {
         axios.get('/app/chat/room/' + roomCode).then(response => {
             room = response.data;
-            refresh();
         });
     }
 
     // 받은 메시지 처리
     function recvMessage(recv) {
         // 배열의 맨 앞에 요소 추가
-        messages.unshift({
-            "type": recv.type,
-            "sender": ((recv.type == 'ENTER') ? '[알림]' : recv.sender),
-            "message": recv.message
-        });
+        messages.unshift(recv);
         refresh();
     }
 
@@ -97,21 +92,24 @@
     function sendMessage(message) {
         // 보낼 때는 controller로 전송
         ws.send("/pub/message", {}, JSON.stringify({
-            type: 'TALK',
+            type: 'TEXT',
             roomCode: roomCode,
             sender: sender,
             message: message
         }));
     }
 
+    onmessage = function (message) {
+        var recv = JSON.parse(message.body);
+        recvMessage(recv);
+    }
+
+
     function connect() {
         // pub/sub event
         ws.connect({}, function (frame) {
             // 받을 때는 구독한 토픽으로부터 읽어온다.
-            ws.subscribe("/topic/room/" + roomCode, function (message) {
-                var recv = JSON.parse(message.body);
-                recvMessage(recv);
-            });
+            ws.subscribe("/topic/room/" + roomCode, onmessage);
 
             // enter 메시지 전송 / 보낼 때는 controller로 전송
             ws.send("/pub/message", {}, JSON.stringify({
@@ -142,26 +140,34 @@
             var msg = messages[0];
             if (msg.type == 'ENTER' || msg.type == 'ALERT') {
                 messageHtml += `<label>${msg.message}</label>`;
-            } else if (msg.sender == sender) {
-                messageHtml += `<div class="message right"> \
-                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg"/> \
-                        <div class="bubble"> \
-                            ${msg.message} \
-                            <div class="corner"></div> \
-                            <span>3 min</span> \
-                        </div> \
-                    </div>`;
             } else {
-                messageHtml += `<div class="message"> \
+                var date = new Date(msg.timestamp);
+                console.log(msg.timestamp);
+                var timeStr = (date.getHours() < 12)? "오전 " + date.getHours() + ":" + date.getMinutes()
+                        : "오후 " + (date.getHours()-12) + ":" + date.getMinutes();
+                console.log(timeStr);
+
+                if (msg.sender == sender) {
+                    messageHtml += `<div class="message right"> \
                         <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg"/> \
                         <div class="bubble"> \
                             ${msg.message} \
                             <div class="corner"></div> \
-                            <span>3 min</span> \
+                            <span>${timeStr}</span> \
                         </div> \
                     </div>`;
-                // ${msg.sender}
+                } else {
+                    messageHtml += `<div class="message"> \
+                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg"/> \
+                        <div class="bubble"> \
+                            ${msg.message} \
+                            <div class="corner"></div> \
+                            <span>${timeStr}</span> \
+                        </div> \
+                    </div>`;
+                    // ${msg.sender}
 
+                }
             }
             document.querySelector('#chat-messages').innerHTML = messageHtml;
         }
