@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Data
 @DynamicInsert
 @DynamicUpdate
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn
 public class Chat {
     @Id
     @GeneratedValue
@@ -25,6 +27,10 @@ public class Chat {
     private ChatType type;
     @Column(nullable = false)
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
     @CreationTimestamp
     private LocalDateTime created;

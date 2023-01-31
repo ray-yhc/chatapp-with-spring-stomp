@@ -7,13 +7,17 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
+import java.time.LocalDateTime;
+
 @Controller
 public class ChatController {
     private final SimpMessageSendingOperations simpMessageSendingOperations;
+    private final ChatService chatService;
 
     @Autowired
-    public ChatController(SimpMessageSendingOperations simpMessageSendingOperations) {
+    public ChatController(SimpMessageSendingOperations simpMessageSendingOperations, ChatService chatService) {
         this.simpMessageSendingOperations = simpMessageSendingOperations;
+        this.chatService = chatService;
     }
 
 
@@ -28,7 +32,11 @@ public class ChatController {
             messageModel.setMessage(messageModel.getSender()+"님이 입장하였습니다.");
         }
 
+        messageModel.setTimestamp(LocalDateTime.now());
+
         simpMessageSendingOperations
                 .convertAndSend("/topic/room/"+ messageModel.getRoomCode(), messageModel);
+
+        chatService.addChat(messageModel);
     }
 }

@@ -2,6 +2,7 @@ package com.example.chatapp.src.chat;
 
 
 import com.example.chatapp.src.chat.Repository.ChatRepository;
+import com.example.chatapp.src.chat.model.MessageModel;
 import com.example.chatapp.src.chat.model.RoomModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +34,12 @@ public class ChatService {
     //채팅방 생성
     public RoomModel createRoom(String name) {
         return chatRepository.createRoom(name);
+    }
+
+    /**
+     * 채팅 전송정보 기록하기
+     */
+    void addChat(MessageModel messageModel) {
+        chatRepository.addChat(messageModel);
     }
 }

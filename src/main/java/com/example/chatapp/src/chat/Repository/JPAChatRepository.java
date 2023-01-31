@@ -1,7 +1,10 @@
 package com.example.chatapp.src.chat.Repository;
 
+import com.example.chatapp.src.chat.entity.Chat;
+import com.example.chatapp.src.chat.entity.ChatImage;
+import com.example.chatapp.src.chat.entity.ChatType;
 import com.example.chatapp.src.chat.entity.Room;
-import com.example.chatapp.src.chat.model.ChatModel;
+import com.example.chatapp.src.chat.model.MessageModel;
 import com.example.chatapp.src.chat.model.RoomModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -84,7 +87,35 @@ public class JPAChatRepository implements ChatRepository {
     }
 
     @Override
-    public ChatModel addChat(ChatModel chatModel) {
-        return null;
+    public long addChat(MessageModel messageModel) {
+        Chat c;
+        if (messageModel.getType() == "IMAGE")
+            c = new ChatImage();
+        else c= new Chat();
+
+        Room r = em.createQuery("select r from Room r where r.roomCode = '"+ messageModel.getRoomCode() + "'",
+                        Room.class)
+                .getSingleResult();
+
+        c.setRoom(r);
+        ChatType type;
+        try{
+            type = ChatType.valueOf(messageModel.getType());
+        } catch(Exception e ) {
+            type = ChatType.ERROR;
+        }
+        c.setType(type);
+        if (c instanceof ChatImage) {
+            ((ChatImage) c).setImageUrl(messageModel.getMessage());
+        } else {
+            c.setContent(messageModel.getMessage());
+        }
+
+        //todo : user 정보 입력하기
+//        User u = e.creteQuery()...;
+//        c.setUser(u);
+
+        em.persist(c);
+        return c.getId();
     }
 }

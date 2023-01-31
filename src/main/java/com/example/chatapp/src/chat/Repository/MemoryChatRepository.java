@@ -1,8 +1,7 @@
 package com.example.chatapp.src.chat.Repository;
 
-import com.example.chatapp.src.chat.model.ChatModel;
+import com.example.chatapp.src.chat.model.MessageModel;
 import com.example.chatapp.src.chat.model.RoomModel;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -49,7 +48,7 @@ public class MemoryChatRepository implements ChatRepository{
     }
 
     @Override
-    public ChatModel addChat(ChatModel chatModel) {
-        return null;
+    public long addChat(MessageModel chatModel) {
+        return 0;
     }
 }

@@ -1,6 +1,6 @@
 package com.example.chatapp.src.chat.Repository;
 
-import com.example.chatapp.src.chat.model.ChatModel;
+import com.example.chatapp.src.chat.model.MessageModel;
 import com.example.chatapp.src.chat.model.RoomModel;
 
 import java.util.List;
@@ -15,5 +15,5 @@ public interface ChatRepository {
     // room id 이용해 1개 채팅방 정보 불러오기
     public RoomModel findRoomById(Long roomId);
     // 챗 저장하기
-    public ChatModel addChat(ChatModel chatModel);
+    public long addChat(MessageModel messageModel);
 }
