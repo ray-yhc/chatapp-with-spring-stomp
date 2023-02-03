@@ -13,13 +13,14 @@ import java.time.LocalDateTime;
 public class ChatController {
     private final SimpMessageSendingOperations simpMessageSendingOperations;
     private final ChatService chatService;
+    private final KafkaChatService kafkaService;
 
     @Autowired
-    public ChatController(SimpMessageSendingOperations simpMessageSendingOperations, ChatService chatService) {
+    public ChatController(SimpMessageSendingOperations simpMessageSendingOperations, ChatService chatService, KafkaChatService kafkaService) {
         this.simpMessageSendingOperations = simpMessageSendingOperations;
         this.chatService = chatService;
+        this.kafkaService = kafkaService;
     }
-
 
 
     /**
@@ -34,9 +35,6 @@ public class ChatController {
 
         messageModel.setTimestamp(LocalDateTime.now());
 
-        simpMessageSendingOperations
-                .convertAndSend("/topic/room/"+ messageModel.getRoomCode(), messageModel);
-
-        chatService.addChat(messageModel);
+        kafkaService.send(messageModel);
     }
 }
