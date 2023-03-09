@@ -100,10 +100,10 @@ public class HlsController {
         for (int i = 0; i < 4; i++)
             builder.addExtraArgs("-map","0:a");
         builder
-//                .addExtraArgs("-c:a","aac")
-//                .addExtraArgs("-b:a","128k")
-//                .addExtraArgs("-ac","1")
-//                .addExtraArgs("-ar","44100")
+                .addExtraArgs("-c:a","aac")
+                .addExtraArgs("-b:a","128k")
+                .addExtraArgs("-ac","1")
+                .addExtraArgs("-ar","44100")
                 .addExtraArgs("-f","hls")
                 .addExtraArgs("-hls_time", "4" )
                 .addExtraArgs("-hls_playlist_type","vod")
